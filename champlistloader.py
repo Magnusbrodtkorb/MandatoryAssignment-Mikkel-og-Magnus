@@ -6,6 +6,7 @@ def _parse_champ(champ_text: str) -> Champion:
     return Champion(name, float(rock), float(paper), float(scissors))
 
 
+
 def from_csv(filename: str) -> dict[str, Champion]:
     champions = {}
     with open(filename, 'r') as f:
