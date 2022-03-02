@@ -1,5 +1,3 @@
-from socket import socket, AF_INET, SOCK_DGRAM
-
-address_family = AF_INET
-socket_type = SOCK_DGRAM
-sock = socket(address_family, socket_type)
+from socket import socket
+sock = socket() # Omit AF_INET and SOCK_STREAM
+sock.connect(("localhost", 5550))
