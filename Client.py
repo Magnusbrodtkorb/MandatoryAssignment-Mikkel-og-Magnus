@@ -37,14 +37,14 @@ class Client:
                             print(f"Pick your {y +1} player")
                             (TLT.input_champion('Player 1', 'red', champions, player1, player2))
                             self.SOCKET.send(str(player1[y]).encode())
-                            print("Waiting for other player")
+                        print("Waiting for other player")
 
                     else:
                         for y in range(2):
                             print(f"Pick your {y +1} player")
                             (TLT.input_champion('Player 2', 'blue', champions, player1, player2))
                             self.SOCKET.send(str(player2[y]).encode())
-                            print("Waiting for other player")
+                        print("Waiting for other player")
 
                 case "MATCHRESULT":
                     print(" ".join(msg.split()[1:]))
