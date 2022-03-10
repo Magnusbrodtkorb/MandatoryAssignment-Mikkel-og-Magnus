@@ -9,14 +9,14 @@ class storageDB:
 
     def __init__(self, PORT):
         print("[DATABASE SERVER IS CREATED]")
-        self.sock.bind(("localkost", PORT))
+        self.sock.bind(("localhost", PORT))
         print(f"[BINDED TO localhost] AT PORT: {PORT}")
 
         self.process_champions()
 
     def process_champions(self):
         while 1:
-            _, source = self.sock.recvfrom(1)
+            _, source = self.sock.recvfrom(6966)
             print("Sending...")
             load = load_some_champs()
             champs = pickle.dumps(load)
@@ -25,5 +25,5 @@ class storageDB:
 
 
 if __name__ == "__main__":
-    PORT = 5555
+    PORT = 6966
     client = storageDB(PORT)

@@ -70,6 +70,10 @@ class Server:
 
 
     def gameLoop(self):
+        db = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        db.sendto(" ".encode(), ("localhost", 6966))
+        update_champs = db.recv(6966)
+        self.champions = pickle.loads(update_champs)
         for i in range(2):
             msg = self.connections[0].recv(6966).decode()
             self.sendToAllClients("Hello")
