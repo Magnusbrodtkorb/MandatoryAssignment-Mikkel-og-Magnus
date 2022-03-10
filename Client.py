@@ -1,62 +1,62 @@
 import pickle
 import socket
-
-import Server
-from core import Match, Team
 import team_local_tactics as TLT
-from champlistloader import load_some_champs
 
 
 class Client:
     SOCKET = socket.socket()
+    player1 = []
+    player2 = []
 
     def __init__(self, PORT) -> None:
         self.SOCKET.connect(("localhost", PORT))
-        print(f"Connected to localhost on the port {PORT}")
+        print(f"Connected to port {PORT}")
         self.gameLoop()
 
     def gameLoop(self):
         while True:
-            msg = self.SOCKET.recv(1024).decode()
+            message = self.SOCKET.recv(1024).decode()
 
-            if not msg:
+            if not message:
                 continue
 
-            match msg.split()[0]:
+            match message.split()[0]:
                 case "MESSAGE":
-                    print(" ".join(msg.split()[1:]))
+                    print(" ".join(message.split()[1:]))
 
                 case "GAME":
-                    champions = load_some_champs()
+                    champ = self.SOCKET.recv(6966)
+                    champions = pickle.loads(champ)
+                    print(champ)
                     TLT.print_available_champs(champions)
-                    player1 = []
-                    player2 = []
 
-                    if msg == "GAME FIRST":
+
+                    if message == "GAME FIRST":
 
                         for y in range(2):
                             print(f"Pick your {y +1} player")
-                            (TLT.input_champion('Player 1', 'red', champions, player1, player2))
-                            self.SOCKET.send(str(player1[y]).encode())
+                            (TLT.input_champion('Player 1', 'red', champions, self.player1, self.player2))
+                            self.SOCKET.send(str(self.player1[y]).encode())
                         print("Waiting for other player")
 
                     else:
                         for y in range(2):
                             print(f"Pick your {y +1} player")
-                            (TLT.input_champion('Player 2', 'blue', champions, player1, player2))
-                            self.SOCKET.send(str(player2[y]).encode())
+                            (TLT.input_champion('Player 2', 'blue', champions, self.player1, self.player2))
+                            self.SOCKET.send(str(self.player2[y]).encode())
                         print("Waiting for other player")
 
-                case "MATCHRESULT":
-                    print("ITS DONE")
+                case "FINISHED":
+                    print("GAME OVER")
                     match_results = self.SOCKET.recv(6966)
-                    math = pickle.loads(match_results)
-                    TLT.print_match_summary(math)
+                    match = pickle.loads(match_results)
+                    TLT.print_match_summary(match)
+                    self.player1.clear()
+                    self.player2.clear()
 
-                    self.shutdown()
-                    break
-                case _:
-                    continue
+
+
+
 
 
 

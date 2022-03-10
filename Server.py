@@ -1,11 +1,7 @@
 import pickle
 import socket
-from pickle import dumps
-
-import team_local_tactics as TLT
 from champlistloader import load_some_champs
 from core import Match, Team
-
 
 champions = load_some_champs()
 
@@ -16,14 +12,13 @@ class Server:
     SOCKET = socket.socket()
     connections = []
 
-
     def __init__(self, PORT) -> None:
-        print("Socket created succsessfully")
+        print("Created socket")
         self.SOCKET.bind(("localhost", PORT))
         print(f"Socket binded to localhost with port {PORT}")
 
         self.SOCKET.listen()
-        print("Waiting for connections...")
+        print("Waiting for connections")
         self.connectionLoop()
 
     # Connection loop
@@ -48,46 +43,48 @@ class Server:
 
         self.gameLoop()
 
-    def sendToAllClients(self, msg):
-        for connect in self.connections:
-            connect.send(msg.encode())
-            print(f"Sent message: {msg} to connection: {connect.getsockname()}")
+    def sendToAll(self, message):
+        for con in self.connections:
+            con.send(message.encode())
+            print(f"Sent message: {message} to connection: {con.getsockname()}")
 
     def matchSum(self):
-        if len(self.player1) == 2 & len(self.player2) == 2:
-            match = Match(
-                Team([champions[name] for name in self.player1]),
-                Team([champions[name] for name in self.player2])
-            )
-            match.play()
-            self.sendToAllClients("MATCHRESULT Game finished: ")
-            send_match = pickle.dumps(match)
-            self.connections[0].send(send_match)
-            self.connections[1].send(send_match)
-            # Print a summary
+        match = Match(
+            Team([champions[name] for name in self.player1]),
+            Team([champions[name] for name in self.player2]))
 
+        match.play()
+        self.sendToAll("FINISHED ")
+        sendmatch = pickle.dumps(match)
+        self.connections[0].send(sendmatch)
+        self.connections[1].send(sendmatch)
 
-
+        # Print a summary
 
     def gameLoop(self):
         db = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         db.sendto(" ".encode(), ("localhost", 6966))
         update_champs = db.recv(6966)
         self.champions = pickle.loads(update_champs)
-        for i in range(2):
-            msg = self.connections[0].recv(6966).decode()
-            self.sendToAllClients("Hello")
-            msg2 = self.connections[1].recv(6966).decode()
-            self.player1.append(msg)
-            self.player2.append(msg2)
+        champion = pickle.dumps(self.champions)
+        self.connections[0].send(champion)
+        self.connections[1].send(champion)
+        while True:
+            for i in range(2):
+                msg = self.connections[0].recv(6966).decode()
+                msg2 = self.connections[1].recv(6966).decode()
+                self.player1.append(msg)
+                self.player2.append(msg2)
+            self.matchSum()
+            self.player1.clear()
+            self.player2.clear()
+            self.sendToAll("GAME")
 
-        print(self.player1)
-        self.matchSum()
 
 
     def shutdown(self):
         self.SOCKET.close()
-        print("Server shutting down")
+        print("Server Closed")
 
 
 if __name__ == "__main__":
