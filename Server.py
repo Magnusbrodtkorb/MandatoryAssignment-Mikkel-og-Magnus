@@ -1,5 +1,6 @@
-import socket
 import pickle
+import socket
+from pickle import dumps
 
 import team_local_tactics as TLT
 from champlistloader import load_some_champs
@@ -59,19 +60,26 @@ class Server:
                 Team([champions[name] for name in self.player2])
             )
             match.play()
+            self.sendToAllClients("MATCHRESULT Game finished: ")
+            send_match = pickle.dumps(match)
+            self.connections[0].send(send_match)
+            self.connections[1].send(send_match)
             # Print a summary
-            TLT.print_match_summary(match)
+
+
+
 
     def gameLoop(self):
         for i in range(2):
             msg = self.connections[0].recv(6966).decode()
+            self.sendToAllClients("Hello")
             msg2 = self.connections[1].recv(6966).decode()
             self.player1.append(msg)
             self.player2.append(msg2)
 
         print(self.player1)
         self.matchSum()
-        self.shutdown()
+
 
     def shutdown(self):
         self.SOCKET.close()

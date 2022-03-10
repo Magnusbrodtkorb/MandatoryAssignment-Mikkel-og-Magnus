@@ -1,8 +1,10 @@
 import pickle
 import socket
+
+import Server
+from core import Match, Team
 import team_local_tactics as TLT
 from champlistloader import load_some_champs
-from core import Champion, Match, Shape, Team
 
 
 class Client:
@@ -25,7 +27,6 @@ class Client:
                     print(" ".join(msg.split()[1:]))
 
                 case "GAME":
-                    print(" ".join(msg.split()[1:]))
                     champions = load_some_champs()
                     TLT.print_available_champs(champions)
                     player1 = []
@@ -47,8 +48,10 @@ class Client:
                         print("Waiting for other player")
 
                 case "MATCHRESULT":
-                    print(" ".join(msg.split()[1:]))
-
+                    print("ITS DONE")
+                    match_results = self.SOCKET.recv(6966)
+                    math = pickle.loads(match_results)
+                    TLT.print_match_summary(math)
 
                     self.shutdown()
                     break
