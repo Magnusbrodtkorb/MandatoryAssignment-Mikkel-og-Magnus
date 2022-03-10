@@ -43,6 +43,7 @@ def input_champion(prompt: str,
                 print(f'{name} is in the enemy team. Try again.')
             case _:
                 player1.append(name)
+                player2.append(name)
                 break
 
 
@@ -88,6 +89,8 @@ def print_match_summary(match: Match) -> None:
         print('\n[blue]Blue victory! :grin:')
     else:
         print('\nDraw :expressionless:')
+
+
 
 
 def main() -> None:
