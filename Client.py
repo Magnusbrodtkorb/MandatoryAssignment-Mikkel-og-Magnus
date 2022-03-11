@@ -15,24 +15,27 @@ class Client:
 
     def gameLoop(self):
         while True:
-            message = self.SOCKET.recv(1024).decode()
+            # Recieve message from server
+            message = self.SOCKET.recv(6966).decode()
 
             if not message:
                 continue
 
             match message.split()[0]:
+                # Print message to Client
                 case "MESSAGE":
                     print(" ".join(message.split()[1:]))
-
+                # Recieve Start Game Command from server
                 case "GAME":
-                    champ = self.SOCKET.recv(6966)
+                    champ = self.SOCKET.recv(4000)
+                    # Load champions from DB and print available champions to Client
                     champions = pickle.loads(champ)
                     print(champ)
                     TLT.print_available_champs(champions)
 
-
+                    # First player to Connect = Player 1
                     if message == "GAME FIRST":
-
+                        #Send input from clients to server
                         for y in range(2):
                             print(f"Pick your {y +1} player")
                             (TLT.input_champion('Player 1', 'red', champions, self.player1, self.player2))
@@ -45,26 +48,21 @@ class Client:
                             (TLT.input_champion('Player 2', 'blue', champions, self.player1, self.player2))
                             self.SOCKET.send(str(self.player2[y]).encode())
                         print("Waiting for other player")
-
+                # When game is finished recieve match result from server and print summary to clients
                 case "FINISHED":
                     print("GAME OVER")
-                    match_results = self.SOCKET.recv(6966)
+                    match_results = self.SOCKET.recv(4000)
                     match = pickle.loads(match_results)
                     TLT.print_match_summary(match)
-                    self.player1.clear()
-                    self.player2.clear()
+        self.shutdown()
 
 
-
-
-
-
-
+    # Close socket when game is over
     def shutdown(self):
         self.SOCKET.close()
         print("Closed connection to server.")
 
 
 if __name__ == "__main__":
-    PORT = 6966
+    PORT = 4000
     client = Client(PORT)

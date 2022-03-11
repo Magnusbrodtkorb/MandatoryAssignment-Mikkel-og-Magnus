@@ -20,7 +20,7 @@ class storageDB:
     def handle_champions(self):
 
         while 1:
-            _, origin = self.sock.recvfrom(6966)
+            _, origin = self.sock.recvfrom(4000)
             print("Sending champs...")
 
             load = load_some_champs()
@@ -30,5 +30,5 @@ class storageDB:
 
 
 if __name__ == "__main__":
-    PORT = 6966
+    PORT = 4000
     client = storageDB(PORT)
