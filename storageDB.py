@@ -1,27 +1,31 @@
-import socket
+from socket import socket, AF_INET, SOCK_DGRAM
 import pickle
 
 from champlistloader import load_some_champs
 
 
 class storageDB:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    address_family = AF_INET
+    socket_type = SOCK_DGRAM
+    sock = socket(address_family, socket_type)
 
     def __init__(self, PORT):
-        print("[DATABASE SERVER IS CREATED]")
+        print("[A DATABASE SERVER HAS BEEN CREATED]")
         self.sock.bind(("localhost", PORT))
         print(f"[BINDED TO localhost] AT PORT: {PORT}")
 
         self.process_champions()
 
     def process_champions(self):
+
         while 1:
-            _, source = self.sock.recvfrom(6966)
-            print("Sending...")
+            _, origin = self.sock.recvfrom(6966)
+            print("Sending champs...")
+
             load = load_some_champs()
             champs = pickle.dumps(load)
-            self.sock.sendto(champs, source)
-            print(f"Champions has been transmitted to {source}")
+            self.sock.sendto(champs, origin)
+            print(f"Champions has been transmitted to {origin}")
 
 
 if __name__ == "__main__":
