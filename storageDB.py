@@ -11,12 +11,13 @@ class storageDB:
 
     def __init__(self, PORT):
         print("[A DATABASE SERVER HAS BEEN CREATED]")
+
         self.sock.bind(("localhost", PORT))
         print(f"[BINDED TO localhost] AT PORT: {PORT}")
 
-        self.process_champions()
+        self.handle_champions()
 
-    def process_champions(self):
+    def handle_champions(self):
 
         while 1:
             _, origin = self.sock.recvfrom(6966)
@@ -25,7 +26,7 @@ class storageDB:
             load = load_some_champs()
             champs = pickle.dumps(load)
             self.sock.sendto(champs, origin)
-            print(f"Champions has been transmitted to {origin}")
+            print(f"Information about the champions has been transmitted to {origin}")
 
 
 if __name__ == "__main__":
